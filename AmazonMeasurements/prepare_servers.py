@@ -1,26 +1,48 @@
 #!/usr/bin/python
 import os
-from subprocess import check_output
+from subprocess import check_output, STDOUT
 
+def parallelscp(copy_from, copy_to, write=True):
+	try:
+		#-oStrictHostKeyChecking=no
+		out = check_output("parallel-scp -l ubuntu -h ../servers.txt -x \"-oStrictHostKeyChecking=no -i /home/shroman/.ssh/aws2.pem\" "
+			+ copy_from + " " + copy_to, shell=True)
+		if (write and out):
+			print out
+	except Exception, e:
+		if write: 
+			print e
+		
+def parallelssh(command, write=True):
+	try:
+		# -oStrictHostKeyChecking=no 
+		out = check_output("parallel-ssh -l ubuntu -h ../servers.txt -x \"-oStrictHostKeyChecking=no -i /home/shroman/.ssh/aws2.pem\" '" 
+						+ command + "'", shell=True)
+		if (write and out):
+			print out
+	except Exception as e:
+		if write: 
+			print e
 
-def parallelscp(copy_from, copy_to, write=False):
-    try:
-        out = check_output("sshpass -f p.txt parallel-scp -A -h ../servers.txt "
-            + copy_from + " " + copy_to + " < p.txt", shell=True)
-        if (write and out):
-            print out
-    except Exception, e:
-        if write: 
-            print e
-
+def run_command(command, write=True):
+	try:
+		out = check_output(command, shell=True, stderr=STDOUT)
+		if (write and out):
+			print out
+	except Exception as e:
+		if write: 
+			print e
+			
 def prepare_servers():
-    os.chdir("/home/shroman/sraid/scripts")
-    for disk in range(1, 5):
-        print "Copy for disk " + str(disk)
-        for i in range(1, 9):
-            print "    proc " + str(i)
-            parallelscp("../server/server.jar", "/shroman/disk" + str(disk) + "/sraid" + str(i) + "/server/server.jar")
+	os.chdir("/home/shroman/amz_sraid/scripts")
 
+	run_command("cp ../client/* /client/")
+	run_command("cp ../server/* /server/")
+	run_command("chmod +x /server/*.sh")
+	run_command("chmod +x /server/*.py")
+	parallelscp("../server/*", "/server/")
+	parallelssh("chmod +x /server/*.sh")
+	parallelssh("chmod +x /server/*.py")
 
 if __name__ == "__main__":
-    prepare_servers()
+	prepare_servers()
