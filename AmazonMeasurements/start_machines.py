@@ -12,11 +12,11 @@ def run_command(command, write=False):
 		if write: 
 			print e
 		
-def parse_machines():
+def parse_machines(filename):
 	counter = 0;
 	machines = []
 	machine = None
-	with open("machines.txt", "r") as f:
+	with open(filename, "r") as f:
 			for line in f.readlines():
 				if ((counter % 3) == 0):
 					if machine:
@@ -25,6 +25,8 @@ def parse_machines():
 				else:
 					machine.append(line.strip())
 				counter+=1
+				
+	machines.append(machine)
 	return machines
 				
 
@@ -41,12 +43,13 @@ def stop_machines(machines):
 		run_command("aws ec2 stop-instances --instance-ids " + region[2] + " --region " + region[0])
 		
 if __name__ == "__main__":
-	if (len(sys.argv) != 2):
+	if (len(sys.argv) != 3):
 		print "Please call the start machines in the following manner:"
-		print "start_machine.py start/stop"
+		print "start_machine.py start/stop filename"
 		exit(0)
 	command = sys.argv[1]
-	machines = parse_machines()
+	filename = sys.argv[2]
+	machines = parse_machines(filename)
 	if command == "start":
 		start_machines(machines)
 	elif command == "stop":
