@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+	<client>
+		<id>12</id>
+		<stripe_size>4</stripe_size><!-- in Megabytes -->
+		<executer_threads_num>2</executer_threads_num>
+		<executer_queue_size>0</executer_queue_size>
+		<server_connection_queue_size>0</server_connection_queue_size>
+	</client>
+	<connections>
+		<server host="34.231.72.222" port="12300" />
+		<server host="54.207.83.244" port="12300" />
+		<server host="18.220.188.143" port="12300" />
+		<server host="13.56.175.253" port="12300" />
+		<server host="52.33.142.212" port="12300" />
+		<server host="35.182.53.17" port="12300" />
+		<server host="52.58.196.52" port="12300" />
+		<server host="54.194.65.31" port="12300" />
+		<server host="35.176.199.135" port="12300" />
+		<server host="52.220.99.19" port="12300" />
+		<server host="52.63.163.125" port="12300" />
+		<server host="13.124.222.222" port="12300" />
+		<server host="52.197.45.14" port="12300" />
+		<server host="13.126.51.100" port="12300" />
+		<server host="34.231.221.128" port="12300" />
+		<server host="54.94.227.132" port="12300" />
+		<server host="18.220.103.69" port="12300" />
+		<server host="13.56.88.139" port="12300" />
+		<server host="35.166.188.40" port="12300" />
+		<server host="52.60.235.9" port="12300" />
+		<server host="35.157.73.15" port="12300" />
+		<server host="34.253.21.118" port="12300" />
+		<server host="35.176.23.107" port="12300" />
+		<server host="52.77.192.206" port="12300" />
+		<server host="52.64.62.56" port="12300" />
+		<server host="13.124.104.105" port="12300" />
+		<server host="52.198.66.187" port="12300" />
+		<server host="13.232.0.92" port="12300" />
+		<!-- NEW MACHINES -->
+		<server host="54.87.131.239" port="12300" />
+		<server host="18.220.237.121" port="12300" />
+		<server host="13.56.142.125" port="12300" />
+		<server host="34.213.170.250" port="12300" />
+		<server host="34.252.111.37" port="12300" />
+		<server host="52.29.43.34" port="12300" />
+		<server host="35.177.245.170" port="12300" />
+		<server host="54.153.212.198" port="12300" />
+		<server host="13.126.165.86" port="12300" />
+	</connections>
+</root>
+
+
+
+

@@ -40,10 +40,6 @@ def prepare_servers():
 	run_command("cp ../server/* /server/")
 	run_command("chmod +x /server/*.sh")
 	run_command("chmod +x /server/*.py")
-	print "PREPARE SERVERS"
-	parallelscp("../server/*", "/server/")
-	parallelssh("chmod +x /server/*.sh")
-	parallelssh("chmod +x /server/*.py")
 
 if __name__ == "__main__":
 	prepare_servers()

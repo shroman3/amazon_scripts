@@ -184,10 +184,10 @@ class ParallelPlatform:
 			print self.exp + " " + self.codec + " experiment started at:",
 			print self.experiment_start
 			
-#			 run_command("java -Xms2g -Xmx2g -jar client.jar " + self.exp + " " 
+#			 run_command("java -Xms5g -Xmx5g -jar client.jar " + self.exp + " " 
 #						 + self.codec + " " + self.k + " " + self.r + " " + self.z + " " 
 #						 + self.random_name + " " + str(self.servers_num) + " " + self.step_size, True)
-			call(["java", "-Xms2g", "-Xmx2g", "-jar", "client.jar", self.exp, self.codec, self.k, self.r, self.z, self.random_name, str(self.servers_num), self.step_size])
+			call(["java", "-Xms10g", "-Xmx10g", "-jar", "client.jar", self.exp, self.codec, self.k, self.r, self.z, self.random_name, str(self.servers_num), self.step_size])
 			# "-Djava.security.egd=file:/dev/./urandom"
 		except Exception, e:
 			print "FAILED"
