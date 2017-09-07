@@ -30,12 +30,12 @@ def parse_machines(filename):
 	return machines
 				
 
-def change_ebs(machines, optimized):
+def change_ebs(machines, attribute):
 	for region in machines:
 		print region
-		run_command("aws ec2 modify-instance-attribute --instance-id " + region[1] + " --region " + region[0] + " " + optimized)
-		run_command("aws ec2 modify-instance-attribute --instance-id " + region[2] + " --region " + region[0] + " " + optimized)
-		run_command("aws ec2 modify-instance-attribute --instance-id " + region[3] + " --region " + region[0] + " " + optimized)
+		run_command("aws ec2 modify-instance-attribute --instance-id " + region[1] + " --region " + region[0] + " " + attribute)
+		run_command("aws ec2 modify-instance-attribute --instance-id " + region[2] + " --region " + region[0] + " " + attribute)
+		run_command("aws ec2 modify-instance-attribute --instance-id " + region[3] + " --region " + region[0] + " " + attribute)
 
 if __name__ == "__main__":
 	if (len(sys.argv) != 3):
