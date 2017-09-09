@@ -284,8 +284,10 @@ class ParallelPlatform:
 					if "net" not in timerow[1] or "cpu" not in timerow[1]:
 						continue
 
-					self.write_measurement_row(csvwriter, "io_p1rB", timerow[1]["io"]["xvda1"][0], t, serv)
-					self.write_measurement_row(csvwriter, "io_p1wB", timerow[1]["io"]["xvda1"][1], t, serv)
+					self.write_measurement_row(csvwriter, "io_p1rB", timerow[1]["io"]["sda1"][0], t, serv)
+					self.write_measurement_row(csvwriter, "io_p1wB", timerow[1]["io"]["sda1"][1], t, serv)
+					self.write_measurement_row(csvwriter, "io_p2rB", timerow[1]["io"]["sda4"][0], t, serv)
+					self.write_measurement_row(csvwriter, "io_p2wB", timerow[1]["io"]["sda4"][1], t, serv)
 					# write network measurements
 					self.write_measurement_row(csvwriter, "net_rcvB", timerow[1]["net"][0], t, serv)
 					self.write_measurement_row(csvwriter, "net_tsmtB", timerow[1]["net"][1], t, serv)

@@ -3,7 +3,7 @@
 from subprocess import check_output, STDOUT
 import sys
 
-def run_command(command, write=False):
+def run_command(command, write=True):
 	try:
 		out = check_output(command, shell=True, stderr=STDOUT)
 		if (write and out):
@@ -40,13 +40,13 @@ def change_machines(machines, instance_type):
 if __name__ == "__main__":
 	if (len(sys.argv) != 3):
 		print "Please call the change machines in the following manner:"
-		print "change_machines.py filename c4.xlarge/m3.medium"
+		print "change_machines.py filename c4.xlarge/m3.medium/c4.large"
 		exit(0)
 	filename = sys.argv[1]
 	instance_type = sys.argv[2]
-	if instance_type != "c4.xlarge" and instance_type != "m3.medium" :
+	if instance_type != "c4.xlarge" and instance_type != "m3.medium" and instance_type != "c4.large":
 		print "Please call the change machines in the following manner:"
-		print "change_machines.py filename c4.xlarge/m3.medium"
+		print "change_machines.py filename c4.xlarge/m3.medium/c4.large"
 		exit(0)
 	machines = parse_machines(filename)
 	change_machines(machines, instance_type)
