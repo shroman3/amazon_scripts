@@ -99,7 +99,7 @@ class ExperimentUtil:
 		iolist = self.parse_io(iostat)
 		if len(iolist) > 0:
 			data['io']['sda1'] = [iolist[0], iolist[1]]
-			data['io']['sdb4'] = [iolist[2], iolist[3]]
+			data['io']['sda4'] = [iolist[2], iolist[3]]
 		# for entry in iostat:
 		#	data['io'][entry[0]] = entry[1:]
 

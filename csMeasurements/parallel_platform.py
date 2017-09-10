@@ -61,8 +61,9 @@ def run_command(command, write=False):
 def parallelssh(command, write=False):
 	try:
 		# -oStrictHostKeyChecking=no 
-		out = check_output("parallel-ssh -l ubuntu -h ../servers.txt -x \"-oStrictHostKeyChecking=no -i /home/shroman/.ssh/aws2.pem\" '" 
-						+ command + "'", shell=True)
+		#out = check_output("parallel-ssh -l ubuntu -h ../servers.txt -x \"-oStrictHostKeyChecking=no -i /home/shroman/.ssh/aws2.pem\" '" 
+		#				+ command + "'", shell=True)
+		out = check_output("sshpass -f p.txt parallel-ssh -A -h ../servers.txt -x \"-oStrictHostKeyChecking=no\" '" + command + "' < p.txt", shell=True)
 		if (write and out):
 			print out
 	except Exception as e:
@@ -72,8 +73,10 @@ def parallelssh(command, write=False):
 def parallelscp(copy_from, copy_to, write=False):
 	try:
 		#-oStrictHostKeyChecking=no
-		out = check_output("parallel-scp -l ubuntu -h ../servers.txt -x \"-oStrictHostKeyChecking=no -i /home/shroman/.ssh/aws2.pem\" "
-			+ copy_from + " " + copy_to, shell=True)
+		#out = check_output("parallel-scp -l ubuntu -h ../servers.txt -x \"-oStrictHostKeyChecking=no -i /home/shroman/.ssh/aws2.pem\" "
+		#	+ copy_from + " " + copy_to, shell=True)
+		out = check_output("sshpass -f p.txt parallel-scp -A -h ../servers.txt -x \"-oStrictHostKeyChecking=no\" "
+            + copy_from + " " + copy_to + " < p.txt", shell=True)
 		if (write and out):
 			print out
 	except Exception, e:
@@ -88,13 +91,13 @@ reinstallation of ceph.
 class ParallelPlatform:
 	def __init__(self):
 		# define dirs
-		self.scdir = "/home/shroman/amz_sraid"
+		self.scdir = "/home/shroman/cs_sraid"
 		self.scriptsdir = self.scdir + "/scripts"
 		self.resultsdir = "/shroman/results"
 
 		os.chdir(self.scdir)
 		
-		self.servers = {}
+		self.servers = []
 		# choose servers, must be ordered
 		if (len(sys.argv) != 9):
 			print "Please call the parallel platform in the following manner:"
@@ -129,10 +132,10 @@ class ParallelPlatform:
 		for conn in e.findall('connections'):
 			for atype in conn.findall('server'):
 				server = atype.get('host')
-				self.servers[server] = self.servers.get(server, 0) + 1
+				self.servers.append(server)
 
 		with open('servers.txt', 'w') as serversfile:
-			for serv in self.servers.keys():
+			for serv in self.servers:
 				serversfile.write("%s\n" % serv)
 
 	def experiment_get_ready(self):
@@ -141,12 +144,12 @@ class ParallelPlatform:
 
 		run_permissions_command = "chmod +x /server/*.sh /server/*.py"
 		rm_stats_command = "sudo rm /server/stats.txt"
-		rm_done_commend = "sudo rm /server/done"
+		rm_done_command = "sudo rm /server/done"
 		clear_cache_command = "sudo echo 3 | sudo tee /proc/sys/vm/drop_caches && sudo sync"
 
 		# client clean up
 		run_command(rm_stats_command)
-		run_command(rm_done_commend)
+		run_command(rm_done_command)
 		run_command(clear_cache_command)
 
 		if (self.start_servers):
@@ -156,11 +159,11 @@ class ParallelPlatform:
 				parallelssh("sudo rm -r /server/123*")
 # 				parallelssh("sudo rm -r /server/logs")
 			print "deleting stats:"
-			parallelssh(rm_stats_command)
-			parallelssh(rm_done_commend)
+			parallelssh("sudo -S rm /server/stats.txt")
+			parallelssh("sudo -S rm /server/done")
 			
 			parallelssh(run_permissions_command)
-			parallelssh(clear_cache_command)
+			parallelssh("sudo -S echo 3 | sudo -S tee /proc/sys/vm/drop_caches && sudo -S sync")
 		
 	def start_serevrs(self):
 		if (self.start_servers):
@@ -223,8 +226,7 @@ class ParallelPlatform:
 		run_stats_parser_command = "nohup /server/stat_parser.py " + timestart.isoformat() + " >/dev/null 2>&1 &"
 		run_command(run_stats_parser_command)
 		if (self.start_servers):
-			print "sleeping for 20 seconds"
-			sleep(15)
+			print "sleeping for 5 seconds"
 			parallelssh(run_stats_parser_command)
 			sleep(5)
 		
@@ -247,13 +249,14 @@ class ParallelPlatform:
 		os.chdir(self.scriptsdir)
 		print "copy stats to results folder"
 		if (self.start_servers):
-			for serv in self.servers:
-				run_command("scp -oStrictHostKeyChecking=no -i /home/shroman/.ssh/aws2.pem ubuntu@" + serv 
+			for index in range(0,self.servers_num):
+				serv = self.servers[index]
+				run_command("sshpass -f p.txt scp -oStrictHostKeyChecking=no " + serv 
 						+ ":/server/stats.txt /shroman/results/" + serv + ".stat")
-				run_command("scp -oStrictHostKeyChecking=no -i /home/shroman/.ssh/aws2.pem ubuntu@" + serv 
+				run_command("sshpass -f p.txt scp -oStrictHostKeyChecking=no " + serv 
 						+ ":/server/logs/IO.logsio /shroman/results/IO_" + serv + ".logsio")
 				for log in {"transmit", "recieve"}:
-					run_command("scp -oStrictHostKeyChecking=no -i /home/shroman/.ssh/aws2.pem ubuntu@" + serv 
+					run_command("sshpass -f p.txt scp -oStrictHostKeyChecking=no " + serv 
 						+ ":/server/logs/" + log + ".logsn /shroman/results/" + log + "_" + serv + ".logsn")
 			
 		run_command("cp /client/logs/* /shroman/results/");
