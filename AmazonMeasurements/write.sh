@@ -1,6 +1,31 @@
 #!/bin/sh
 echo "Writing"
 
+function run_test {
+	n=$(($3+$4+$5))
+	echo "---===  $1 $2 k=$3 r=$4 z=$5 rand=$6 n=$n servers=$7 ===---"
+	python parallel_platform.py $1 $2 $3 $4 $5 $6 $7 $n
+}
+
+function basic_read_test {
+	run_test read $1 $2 $3 $4 NONE $5
+	run_test fread $1 $2 $3 $4 NONE $5
+	run_test sf1 $1 $2 $3 $4 NONE $5
+	if (($3>1)); then
+		run_test sf2 $1 $2 $3 $4 NONE $5
+	fi
+}
+
+function rand_read_test {
+	racod=$1"_RA"
+	run_test rcr $racod $2 $3 $4 NONE $5 $n
+}
+
+function read_test {
+	basic_read_test $1 $2 $3 $4 $5
+	rand_read_test $1 $2 $3 $4 $5
+}
+
 function run_codecs {
 	servers=$2
 	k=$1
@@ -11,35 +36,20 @@ function run_codecs {
 	  		do
 	    		for cod in PSS BB
 	    		do
-					for rand in AES NONE
+					for rand in AES
 					do
-	      				n=$(($k+$re+$z))
-	      				echo "---=== WRITE $cod $rand k=$k r=$re z=$z n=$n sn=$servers ===---"
-	      				python parallel_platform.py write $cod $k $re $z $rand $servers $n
+	      				run_test write $cod $k $re $z $rand $servers $n
 	    			done
-	    			echo "---=== READ $cod $rand k=$k r=$re z=$z n=$n sn=$servers ===---"
-					python parallel_platform.py read $cod $k $re $z NONE $servers $n
-					echo "---=== FAST_READ $cod $rand k=$k r=$re z=$z n=$n sn=$servers ===---"
-					python parallel_platform.py fread $cod $k $re $z NONE $servers $n
-					cod+="_RA"
-					echo "---=== RANDOM CHUNK READ $cod $rand k=$k r=$re z=$z n=$n sn=$servers ===---"
-					python parallel_platform.py rcr $cod $k $re $z NONE $servers $n
+					read_test $cod $k $re $z $servers
 	  			done
 		done
 		
 		z=0
-		n=$(($k+$re))
-		for cod in AES CHA AES_BC AONT_AES AONT_CHA AONT_AES_BC NONE
+		rand=NONE
+		for cod in AES CHA AONT_AES NONE
 		do
-			echo "---===  WRITE $cod k=$k r=$re n=$n sn=$servers ===---"
-			python parallel_platform.py write $cod $k $re 0 NONE $servers $n
-			echo "---=== READ $cod k=$k r=$re z=$z n=$n sn=$servers ===---"
-			python parallel_platform.py read $cod $k $re 0 NONE $servers $n
-			echo "---=== FAST_READ $cod k=$k r=$re z=$z n=$n sn=$servers ===---"
-			python parallel_platform.py fread $cod $k $re 0 NONE $servers $n
-			cod+="_RA"
-			echo "---=== RANDOM CHUNK READ $cod k=$k r=$re z=$z n=$n sn=$servers ===---"
-			python parallel_platform.py rcr $cod $k $re 0 NONE $servers $n
+			run_test write $cod $k $re $z $rand $servers $n
+			read_test $cod $k $re $z $servers
 		done
 	done
 }
@@ -53,19 +63,11 @@ function run_sss {
 	do
 		for re in 2
 		do 
-			for rand in AES SIMPLE NONE
+			for rand in AES
 			do
-				n=$(($z+$re+$k))
-		  		echo "---===  SSS $rand r=$re z=$z sn=$servers ===---"
-	  			python parallel_platform.py write $cod $k $re $z $rand $servers $n
+				run_test write $cod $k $re $z $rand $servers $n
 			done
-			echo "---=== READ $cod $rand k=$k r=$re z=$z n=$n sn=$servers ===---"
-	  		python parallel_platform.py read $cod $k $re $z NONE $servers $n
-	  		echo "---=== FAST READ $cod $rand k=$k r=$re z=$z n=$n sn=$servers ===---"
-			python parallel_platform.py fread $cod $k $re $z NONE $servers $n
-			cod+="_RA"
-			echo "---=== RANDOM CHUNK READ $cod $rand k=$k r=$re z=$z n=$n sn=$servers ===---"
-			python parallel_platform.py rcr $cod $k $re $z NONE $servers $n
+			basic_read_test $cod $k $re $z $servers
 		done
 	done
 }

@@ -114,15 +114,19 @@ class ExperimentUtil:
 		# use /proc/net/dev, lo and eno1 are the used interfaces
 		net_inst.update()
 		try:
-			diffdata = (int(net_inst['eth0']['receive']['bytes']),
-						int(net_inst['eth0']['transmit']['bytes']),
-						int(net_inst['lo']['receive']['bytes']),
-						int(net_inst['lo']['transmit']['bytes']))
+			interface_name = 'lo'
+			if 'enp5s0f0' in net_inst:
+				interface_name = 'enp5s0f0' 
+			elif 'enp5s0f0' in net_inst:
+				interface_name = 'enp6s0f0'
+			elif 'eth0' in net_inst:
+				interface_name = 'eth0'
+			diffdata = (int(net_inst[interface_name]['receive']['bytes']),
+							int(net_inst[interface_name]['transmit']['bytes']),
+							int(net_inst['lo']['receive']['bytes']),
+							int(net_inst['lo']['transmit']['bytes']))
 		except Exception:
-			diffdata = (int(net_inst['eno1']['receive']['bytes']),
-						int(net_inst['eno1']['transmit']['bytes']),
-						int(net_inst['lo']['receive']['bytes']),
-						int(net_inst['lo']['transmit']['bytes']))
+			diffdata = (-1,-1,-1,-1)
 		if len(self.prev_net_diffdata) > 0:
 			data["net"] = tuple(numpy.subtract(diffdata, self.prev_net_diffdata))
 		self.prev_net_diffdata = diffdata
